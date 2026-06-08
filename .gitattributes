@@ -1,0 +1,2 @@
+# Skrypty powlokowe musza miec konce linii LF (inaczej nie zadzialaja w kontenerze)
+*.sh text eol=lf

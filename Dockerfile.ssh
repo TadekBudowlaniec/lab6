@@ -1,0 +1,49 @@
+# syntax=docker/dockerfile:1
+# ^ Rozszerzony frontend BuildKit - wymagany dla --mount=type=ssh. Pierwsza linia.
+
+# =============================================================================
+#  PAwChO Lab 6 - wariant pobierajacy zawartosc repo pawcho6 przez SSH
+#  wewnatrz procesu budowania (instrukcja RUN --mount=type=ssh).
+#  Budowa:  docker build --ssh default -f Dockerfile.ssh \
+#               --build-arg VERSION=lab6 -t ghcr.io/<konto>/pawcho6:lab6 .
+# =============================================================================
+
+# ---- Etap 1: pobranie kodu z repo pawcho6 przez protokol SSH ----------------
+FROM alpine:3.20 AS source
+
+RUN apk add --no-cache git openssh-client
+
+# Klucz hosta github.com (eliminuje interaktywne potwierdzenie autentycznosci).
+RUN mkdir -p -m 0700 /root/.ssh \
+    && ssh-keyscan github.com >> /root/.ssh/known_hosts 2>/dev/null
+
+# Forwarding agenta SSH z hosta (--ssh default). NIE uzywamy --build-arg.
+RUN --mount=type=ssh \
+    git clone git@github.com:TadekBudowlaniec/pawcho6.git /src
+
+# ---- Etap 2: builder - wstrzykniecie wersji do szablonu strony --------------
+FROM alpine:3.20 AS builder
+
+ARG VERSION=dev
+WORKDIR /build
+
+COPY --from=source /src/web/ ./web/
+
+RUN sed -i "s/__VERSION__/${VERSION}/g" web/index.html.template \
+    && chmod +x web/40-generate-index.sh
+
+# ---- Etap 3: serwer HTTP Nginx ---------------------------------------------
+FROM nginx:1.27-alpine
+
+LABEL org.opencontainers.image.title="pawcho6" \
+      org.opencontainers.image.description="Aplikacja webowa (IP, hostname, wersja) na Nginx - PAwChO Lab 6 (kontekst SSH)" \
+      org.opencontainers.image.authors="Cezary Prusak" \
+      org.opencontainers.image.source="https://github.com/TadekBudowlaniec/pawcho6"
+
+COPY --from=builder /build/web/index.html.template /usr/share/nginx/template/index.html.template
+COPY --from=builder /build/web/40-generate-index.sh /docker-entrypoint.d/40-generate-index.sh
+
+EXPOSE 80
+
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+    CMD wget -qO- http://127.0.0.1/ >/dev/null 2>&1 || exit 1

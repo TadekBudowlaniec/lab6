@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PAwChO &mdash; pawcho6</title>
+    <style>
+        body { font-family: system-ui, sans-serif; max-width: 640px; margin: 4rem auto; padding: 0 1rem; }
+        h1 { color: #1a3a7a; }
+        table { border-collapse: collapse; margin-top: 1rem; }
+        td { padding: .4rem .8rem; border: 1px solid #ccc; }
+        td.k { background: #eef2fb; font-weight: 600; }
+        code { background: #f4f4f4; padding: .1rem .3rem; border-radius: 3px; }
+    </style>
+</head>
+<body>
+    <h1>PAwChO &mdash; Laboratorium 5/6</h1>
+    <p>Aplikacja webowa serwowana przez Nginx (build wieloetapowy).</p>
+    <table>
+        <tr><td class="k">Adres IP serwera</td><td><code>__IP__</code></td></tr>
+        <tr><td class="k">Nazwa serwera (hostname)</td><td><code>__HOSTNAME__</code></td></tr>
+        <tr><td class="k">Wersja aplikacji</td><td><code>__VERSION__</code></td></tr>
+    </table>
+</body>
+</html>
