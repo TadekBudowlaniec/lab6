@@ -82,9 +82,4 @@ docker build --ssh default -f Dockerfile.ssh \
 echo $CR_PAT | docker login ghcr.io -u tadekbudowlaniec --password-stdin
 docker push ghcr.io/tadekbudowlaniec/pawcho6:lab6
 ```
-Następnie: widoczność pakietu zmieniona z **private** na **public**, a pakiet
-powiązany z tym repozytorium git przez etykietę
-`org.opencontainers.image.source` (ustawioną w Dockerfile).
 
-> Pełna procedura krok po kroku (logowanie `gh`, klucz SSH, PAT, push, public):
-> patrz [`RUNBOOK.md`](./RUNBOOK.md).
